@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="shpc_100953@xiyoucloud.vip:46022 password">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../../Code" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="shpc_100953@xiyoucloud.vip:46022 password (2)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../../Code" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="shpc_100953@xiyoucloud.vip:46022 password (3)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../../Code" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
