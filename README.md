@@ -1,6 +1,48 @@
 # Pubmed_Clawer
 
-  
+
+
+## 简单使用方法
+
+```bash
+python main_protect.py --url "?term=circRNA&format=abstract&sort=date&size=50" --pagenums 1 --papernumber 1
+
+```
+
+参数解释：
+
+`--url`网页链接，仿照我的例子进行填写
+
+`--pagenums`你想要查找多少页
+
+`--papernumber`下载多少篇免费文章；小提示：如果你不想下载文献就填0，如果你想现在很多文献，这个参数就不要设置。
+
+
+
+### 详细使用方法
+
+1.打开pubmed，https://pubmed.ncbi.nlm.nih.gov/在pubmed搜点你想要的东西，比如我以关键词circRNA为关键词进行检索
+
+2.将地址栏中位于nih.gov/后的参数复制下来，比如我这里是
+“?term=circRNA&format=abstract&sort=date&size=50”
+
+4.在终端或者python环境下运行，`简单使用方法`的命令。
+
+5.需要注意的是，输入页数时，每页50个，如果数字太大，对服务器造成负担可能会导致ip被封（暂未发现），建议控制在20页以下。然后输入需要下载的文献数量，程序会从搜索结果中找到free pmc 免费文献，自动下载，这里下载速度取决你的网络状况。每个文献下载超过60s自动超时跳过，下载下一个。
+
+6.文献会自动下载到的"document/pub/"下
+
+7.文章信息会保存在research_res文件夹下，推荐查看含有jcr字母文件名的文件。（内含影响因子2021年度）
+
+
+
+## 结果展示
+
+![image-20230418210050317](./media//image-20230418210050317.png)
+
+
+
+## 其他  
 
 主要功能：
 
@@ -42,33 +84,6 @@ timevar.py文件，里面含有一个在整个程序一次运行中，需要被�
 save2excel.py文件是针对有时候爬虫没执行完又想导出信息的一个模块，独立于以上组件，只要有sql数据库和table就能查询保存成excel
 
 
-使用方法：
-
-1.打开pubmed，https://pubmed.ncbi.nlm.nih.gov/
-
-在pubmed搜点你想要的东西，比如我以关键词“alzheimer's disease”(阿尔茨海默病）为关键词进行检索
-
-
-
-2.将地址栏中位于nih.gov/后的参数复制下来，比如我这里是
-“?term=alzheimer%27s+disease&filter=datesearch.y_5&size=20”
-
-
-​    
-
-3.打开文件夹，看到pubmedsoso.exe可执行文件后，确保它所在的目录下有document文件夹，文件夹里有pub子文件夹，就像这样，没有就手动创建吧。
-
-
-
-4.在pycharm或者vscode等python环境下运行main.py
-
-5.显示“请在下面粘贴你构建的搜索结果的parameter”后，按提示输入信息即可以，需要注意的是，输入页数时，每页50个，如果数字太大，对服务器造成负担可能会导致ip被封（暂未发现），建议控制在
-20页以下。
-然后输入需要下载的文献数量，程序会从搜索结果中找到free pmc 免费文献，自动下载，这里下载速度取决你的网络状况。每个文献下载超过60s自动超时跳过，下载下一个。
-
-6.文献会自动下载到之前说的"document/pub/"下，同时会生成原始遍历信息的txt文件，程序最终执行完成会生成excel文件。
-
-  
 
 
 TO DO:
