@@ -70,3 +70,23 @@ df.to_csv('J_Medline.csv', index=False)
 
 
 
+
+
+# 开始测试scihub.py
+from scihub import SciHub
+sh = SciHub()
+
+# 通过doi下载
+
+# exactly the same thing as fetch except downloads the articles to disk
+# if no path given, a unique name will be used as the file name
+# 直接下载是可行的
+#%%
+result = sh.download('https://doi.or86/s13045-021-01052-y', path='./document/pub/test.pdf')
+print("sss")
+
+
+
+
+
+

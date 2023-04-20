@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
-os.chdir("/Users/hanxiangming/Downloads/Pubmedsoso-1.1.2")
+# os.chdir("")
 os.getcwd()
 import sys
-sys.path.append("/Users/hanxiangming/Downloads/Pubmedsoso-1.1.2")
+# sys.path.append("")
 from spiderpub import spiderpub
 from downpmc import downpmc
 from geteachinfo import geteachinfo

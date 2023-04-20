@@ -11,6 +11,9 @@ import re
 import eventlet
 import xlwt
 from timevar import savetime
+from scihub import SciHub
+sh = SciHub()
+
 
 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9034016/pdf/main.pdf
 # 下载pdf的函数
@@ -56,7 +59,7 @@ def savepdf(html,PMCID,name,dbpath):
     try:
         name=re.sub(r'[< > / \\ | : " * ?]',' ',name)
         #需要注意的是文件命名中不能含有以上特殊符号，只能去除掉
-        savepath="./document/pub/%s.pdf"%name
+        savepath="../document/pub/%s.pdf"%name
         file=open(savepath,'wb')
         print("open success")
         file.write(html)
@@ -116,6 +119,8 @@ def save2excel(dbpath):
          print("\n爬取数据库信息保存到excel失败\n")
 
 
+
+# 属于重复的，在geteachinfo里面就有了，现在是使用这个
 def readdata1(dbpath,free): #读取数据库，返回想查询的文献的PMID
     tablename = 'pubmed%s'%savetime
     print(tablename)
@@ -125,7 +130,7 @@ def readdata1(dbpath,free): #读取数据库，返回想查询的文献的PMID
         try:
 
             if free==1:
-                #选择 tablename 表中的两列数据：PMCID 和 doctitle。仅选择 freemark 列的值为 2 的行。返回查询结果。
+                #选择 tablename 表中的两列数据：PMCID 和 doctitle。仅选择 freemark 列的值为 1 的行。返回查询结果。
                 # 值得注意的是，由于在 SQL 查询语句中嵌入了 Python 变量，因此需要格外小心避免 SQL 注入攻击。最好的方法是使用参数化查询，而不是将变量插入 SQL 查询字符串中。
                 sql = "SELECT PMCID,doctitle FROM %s WHERE freemark = 1"%tablename
                 # 根据设置的freemark参数，查找数据库文献的信息,free=1用于查找所有免费文献用来下载，而free=2用于拿数据所有文献去获得详细信息
@@ -137,14 +142,16 @@ def readdata1(dbpath,free): #读取数据库，返回想查询的文献的PMID
                 # print(result)
                 print('读取sql信息成功 数据类型为PMCID和doctitle\n')
                 return result
+            # 这里选择的是没有免费全文的文献
             elif free==0:
-                sql = "SELECT PMID FROM %s"%tablename#查找数据库文献的信息
+                sql = "SELECT doilink,doctitle FROM %s WHERE freemark = 0"%tablename#查找数据库文献的信息
+                print(sql)
                 cursor.execute(sql)
                 result = cursor.fetchall()
-                for i in range(len(result)):
-                    result[i] = result[i][0]
-                print(result)
-                print('读取sql信息成功，数据类型为PMID\n')
+                # for i in range(len(result)):
+                #     result[i] = result[i][0]
+                # print(result)
+                print('读取sql信息成功，数据类型为doilink和doctitle\n')
                 return result
 
         except:
@@ -156,8 +163,38 @@ def readdata1(dbpath,free): #读取数据库，返回想查询的文献的PMID
         print("连接数据库失败，请检查目标数据库\n")
 
 
+# ----------------------
+
+def savepdfscihub(doilink,name,dbpath):
+    tablename = 'pubmed%s'%savetime
+    # pdf = html.decode("utf-8")  # 使用Unicode8对二进制网页进行解码，直接写入文件就不需要解码了
+
+    try:
+        name=re.sub(r'[< > / \\ | : " * ?]',' ',name)
+        #需要注意的是文件命名中不能含有以上特殊符号，只能去除掉
+        savepath="./document/pub/%s.pdf"%name
+        resinfo = sh.download(doilink, path=savepath)
+        if resinfo ==None:
+            # print("%s.pdf"%name,"文件写入到Pubmed/document/pub/下成功")
+            print("pdf文件写入成功,文件名为 %s"%name,"保存路径为Pubmed/document/pub/")
+            try:
+                conn=sqlite3.connect(dbpath)
+                cursor=conn.cursor()
+                cursor.execute(" UPDATE %s SET savepath = ? WHERE doilink =?"%tablename,
+                               (savepath,doilink))
+                conn.commit()
+                cursor.close()
+                return 'success'
+                print("pdf文件写入成功,文件ID为 %s"%name,"地址写入到数据库pubmedsql下的table%s中成功"%tablename)
+            except:
+                print("pdf文件保存路径写入到数据库失败")
+    except:
+        print("pdf文件写入失败,文件ID为 %s"%name,"文件写入失败,检查路径")
 
 
+# ---------------------
+
+# 下载的主函数，这个函数调用其他函数
 def downpmc(limit):
     tablename = 'pubmed%s'%savetime
     # 设置下载文献的数量
@@ -165,6 +202,7 @@ def downpmc(limit):
     dbpath = 'pubmedsql'
     # pubmed id和文章标题
     result = readdata1(dbpath, 1)
+    resultscihub = readdata1(dbpath, 0)
     for item in result:
         count+=1
 
@@ -185,6 +223,21 @@ def downpmc(limit):
             print("保存pdf文件发生错误，自动跳过该文献PMCID为 %s"%item[0])
             continue
         time.sleep(random.randint(0,1))
+
+    for item in resultscihub:
+        count+=1
+        if count > limit:
+            print("已达到需要下载的上限，下载停止\n")
+            break
+        print("开始下载第%d篇"%count)
+        #resultscihub是从数据库获取的列表元组，其中的每一项构成为doilink,doctitle
+        status = savepdfscihub(item[0], item[1], dbpath)
+        if status == None:
+            print("保存pdf文件发生错误，自动跳过该文献name为 %s" % item[1])
+            continue
+        time.sleep(random.randint(0, 1))
+
+
     save2excel('./pubmedsql')
     print("爬取最终结果信息已经自动保存到excel表格中，文件名为%s"%tablename)
     print("爬取的所有文献已经保存到/document/pub/目录下")
@@ -198,6 +251,8 @@ def downpmc(limit):
     #     time.sleep(random.randint(1,5))
 
 
+
+# 添加影响因子的函数
 def addjcr(savetime):
     # 读取本目录下的2022_JCR_IF_ming.xlsx文件
     import pandas as pd
