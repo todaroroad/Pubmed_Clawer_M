@@ -34,6 +34,8 @@ python main_protect.py --url "?term=circRNA&format=abstract&sort=date&size=50" -
 
 7.文章信息会保存在research_res文件夹下，推荐查看含有jcr字母文件名的文件。（内含影响因子2021年度）
 
+8.程序集成了sic_hub功能
+
 
 ## 报错是因为没有安装依赖
 
@@ -99,8 +101,6 @@ save2excel.py文件是针对有时候爬虫没执行完又想导出信息的一�
 
 
 TO DO:
-
-对非免费文献的scihub自动补全下载
 
 整合chatgpt
 
